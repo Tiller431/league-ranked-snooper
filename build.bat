@@ -1,0 +1,1 @@
+pyinstaller --noconfirm --onefile --console --icon "icon.ico" --collect-all "requests" --collect-all "psutil" snooper.py
