@@ -5,7 +5,7 @@ import json as j
 import base64 as b
 import time 
 
-riotCertPath = 'C:\\riotgames.pem'
+riotCertPath = '.\\riotgames.pem'
 
 
 def getHiddenNames():
@@ -14,29 +14,30 @@ def getHiddenNames():
     e=list(r.get(url=f'https://127.0.0.1:{x[0]}/chat/v5/participants/champ-select',headers={'Authorization':f"Basic {b.b64encode(f'riot:{x[1]}'.encode()).decode()}",'Accept': 'application/json'},verify=riotCertPath))
     return [ i['name'] for i in j.loads(''.join(s.decode() for s in e))['participants']]
 
-def openUgg(name):
-    # opens the u.gg page of the player with the given name
-    print(f'Opening u.gg page for {name}')
-    o.startfile(f'https://u.gg/lol/profile/na1/{name}/overview')
+def openOpGG(names):
+    # opens a multisearch of the given names on op.gg
+    url = 'https://www.op.gg/multisearch/na?summoners='
+    for name in names:
+        url += name + ','
+    o.startfile(url)
 
 def main():
-    global summonerNames
+    global previousNames
     #check if LeagueClient is running
     if not any(i.name() == 'LeagueClient.exe' for i in u.process_iter()):
         return
 
     # opens the u.gg page of the player with the given name
-    for username in getHiddenNames():
-        if username not in summonerNames:
-            summonerNames.append(username)
-            openUgg(username)
-        else:   
-            break
+    names = getHiddenNames()
+    if names != previousNames:
+        openOpGG(names)
+        previousNames = names
+
 
 if __name__ == '__main__':
     print('Press Ctrl-C or the X button to quit.')
-    global summonerNames
-    summonerNames = []
+    global previousNames
+    previousNames = []
 
     # check if the riotgames.pem file exists
     if not o.path.exists(riotCertPath):
@@ -54,7 +55,7 @@ if __name__ == '__main__':
                 if f.read() != cert.content:
                     f.write(cert.content)
         except:
-            print('Error: The riotgames.pem file is invalid and could not be replaced.\nTry deleting the file and restarting the program.\nC:\\riotgames.pem')
+            print('Error: The riotgames.pem file is invalid and could not be replaced.\nTry deleting the file and restarting the program.\n{}'.format(riotCertPath))
             pass
     while True:
         main()
