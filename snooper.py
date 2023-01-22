@@ -17,9 +17,12 @@ def getHiddenNames():
 def openOpGG(names):
     # opens a multisearch of the given names on op.gg
     url = 'https://www.op.gg/multisearch/na?summoners='
-    for name in names:
-        url += name + ','
-    o.startfile(url)
+    if len(names) == 5:
+        for name in names:
+            url += name + ','
+        o.startfile(url)
+    else:
+        return
 
 def main():
     global previousNames
